@@ -1,33 +1,55 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { Link, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
-
-const API_URL = 'http://localhost:8000'
+import HomePage from './pages/HomePage'
+import GamePage from './pages/GamePage'
+import { createGame } from './api'
 
 function App() {
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [newGameLength, setNewGameLength] = useState(5)
 
-  useEffect(() => {
-    fetch(`${API_URL}/`)
-      .then((response) => response.json())
-      .then((data) => {
-        setMessage(data.message)
-        setLoading(false)
-      })
-      .catch((error) => {
-        console.error('Error fetching from API:', error)
-        setMessage('Failed to connect to API')
-        setLoading(false)
-      })
-  }, [])
+  const navigate = useNavigate()
+  const handleCreateGame = async (wordLength) => {
+    try {
+      const createdGame = await createGame(wordLength)
+      navigate(`/game/${createdGame.id}`)
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   return (
-    <>
-      <h1>Wordle</h1>
-      <div className="card">
-        <p>API Response: {loading ? 'Loading...' : message}</p>
-      </div>
-    </>
+    <div className="App">
+      <header className="app-header">
+        <h1><Link to="/">Authentic Wordle</Link></h1>
+      </header>
+
+      <main className="app-content">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HomePage
+                newGameLength={newGameLength}
+                onNewGameLengthChange={setNewGameLength}
+                onCreateGame={handleCreateGame}
+              />
+            }
+          />
+          <Route
+            path="/game/:gameId"
+            element={
+              <GamePage
+                newGameLength={newGameLength}
+                onNewGameLengthChange={setNewGameLength}
+                onCreateGame={handleCreateGame}
+              />
+            }
+          />
+          <Route path="/game" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </div>
   )
 }
 
