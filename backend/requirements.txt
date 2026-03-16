@@ -1,2 +1,6 @@
 fastapi>=0.109.0
 uvicorn[standard]>=0.27.0
+SQLAlchemy>=2.0.0
+wonderwords>=0.2.5
+inflect>=7.0.0
+pyspellchecker>=0.7.0
